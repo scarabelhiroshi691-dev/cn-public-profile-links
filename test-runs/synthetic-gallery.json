@@ -1,0 +1,119 @@
+{
+  "notice": "Synthetic placeholders, no captured images.",
+  "notes": [
+    {
+      "url": "https://example.org/note-1",
+      "images": [
+        {
+          "index": 1,
+          "source_image": null
+        },
+        {
+          "index": 2,
+          "source_image": null
+        },
+        {
+          "index": 3,
+          "source_image": null
+        },
+        {
+          "index": 4,
+          "source_image": null
+        },
+        {
+          "index": 5,
+          "source_image": null
+        },
+        {
+          "index": 6,
+          "source_image": null
+        },
+        {
+          "index": 7,
+          "source_image": null
+        },
+        {
+          "index": 8,
+          "source_image": null
+        },
+        {
+          "index": 9,
+          "source_image": null
+        },
+        {
+          "index": 10,
+          "source_image": null
+        },
+        {
+          "index": 11,
+          "source_image": null
+        },
+        {
+          "index": 12,
+          "source_image": null
+        },
+        {
+          "index": 13,
+          "source_image": null
+        }
+      ]
+    },
+    {
+      "url": "https://example.org/note-2",
+      "images": [
+        {
+          "index": 1,
+          "source_image": null
+        },
+        {
+          "index": 2,
+          "source_image": null
+        },
+        {
+          "index": 3,
+          "source_image": null
+        },
+        {
+          "index": 4,
+          "source_image": null
+        },
+        {
+          "index": 5,
+          "source_image": null
+        },
+        {
+          "index": 6,
+          "source_image": null
+        },
+        {
+          "index": 7,
+          "source_image": null
+        },
+        {
+          "index": 8,
+          "source_image": null
+        },
+        {
+          "index": 9,
+          "source_image": null
+        },
+        {
+          "index": 10,
+          "source_image": null
+        },
+        {
+          "index": 11,
+          "source_image": null
+        },
+        {
+          "index": 12,
+          "source_image": null
+        },
+        {
+          "index": 13,
+          "source_image": null
+        }
+      ]
+    }
+  ]
+}

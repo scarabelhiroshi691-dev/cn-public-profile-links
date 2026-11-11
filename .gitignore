@@ -1,0 +1,24 @@
+# Runtime and user data
+/runs/
+/eval/
+/release/
+/test-runs/*
+!/test-runs/synthetic-*.json
+/.playwright-cli/
+**/.env
+**/.env.*
+**/BrowserProfiles/
+**/User Data/
+**/Cookies
+**/Login Data
+**/__pycache__/
+*.py[cod]
+*.log
+*.lock
+node_modules/
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.sqlite*
