@@ -15,6 +15,8 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
+from runtime_config import ConfigError, get_config, local_path as configured_path
+
 PROJECT = Path(__file__).resolve().parents[1]
 READ = {"read", "partial", "unread", "login_required", "verification_required", "failed"}
 RELATIONS = {"unconfirmed", "possible", "confirmed", "conflict", "excluded"}
@@ -99,16 +101,10 @@ def image_identity(value):
 
 
 def local_path(value, writing=False):
-    # Check both the supplied and resolved paths (including junctions).
-    if PureWindowsPath(str(value)).drive.upper() == "E:":
-        raise LedgerError("E drive is frozen")
-    p = Path(value)
-    p = p.resolve()
-    if PureWindowsPath(str(p)).drive.upper() == "E:":
-        raise LedgerError("E drive is frozen")
-    if writing and p.drive.upper() != "F:":
-        raise LedgerError("Runtime output must remain on F drive")
-    return p
+    try:
+        return configured_path(value, writing=writing)
+    except ConfigError as error:
+        raise LedgerError(str(error)) from error
 
 
 def fields(data, allowed, required=()):
@@ -149,7 +145,7 @@ def _pid_alive(pid):
 
 class Store:
     def __init__(self, directory=None):
-        self.directory = local_path(directory or PROJECT / "runs", writing=True)
+        self.directory = local_path(directory or get_config()["data_dir"], writing=True)
         self.directory.mkdir(parents=True, exist_ok=True)
 
     def path(self, task_id):

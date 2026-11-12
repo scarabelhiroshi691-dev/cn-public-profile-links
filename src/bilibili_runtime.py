@@ -1,4 +1,5 @@
 """Bounded Bilibili nickname discovery and one video clue on the same ledger."""
+from runtime_config import browser_command, child_env, get_config
 import json
 import os
 import re
@@ -349,10 +350,10 @@ def decision(task):
 
 
 def call_browser(request):
-    temp = "F:/codex/Temp/public-profile-runtime"
-    proc = subprocess.run(["C:/Program Files/nodejs/node.exe", str(PROJECT / "scripts/bilibili_executor.mjs"),
+    temp = get_config()["temp_dir"]
+    proc = subprocess.run(browser_command("bilibili_executor.mjs") + [
                            json.dumps(request, ensure_ascii=False)], cwd=PROJECT, capture_output=True, text=True,
-                          encoding="utf-8", timeout=35, env={**os.environ, "TEMP": temp, "TMP": temp})
+                          encoding="utf-8", timeout=35, env=child_env())
     if proc.returncode:
         return {"status": "failed", "reason": "浏览器步骤失败，已保留原任务与待核对来源"}
     return json.loads(proc.stdout)

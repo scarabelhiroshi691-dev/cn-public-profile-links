@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "storage": {
+    "root": ".local",
+    "blocked_drives": ["E:"],
+    "extra_write_roots": []
+  },
+  "runtime": {
+    "node": "",
+    "cli": ""
+  },
+  "browser": {
+    "session": "",
+    "profile": "",
+    "channel": "chrome",
+    "executable": ""
+  }
+}

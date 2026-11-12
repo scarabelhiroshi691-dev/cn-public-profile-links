@@ -1,6 +1,10 @@
-# 公开账号关联首版使用说明（Codex 内试用）
+# 公开账号关联使用说明（Codex 内试用）
 
-当前为 **2026-11-11 Codex 内试用版**，沿用 11 月 10 日确认的首版定位。使用时在项目对话里直接发昵称或公开链接。Codex 负责浏览、审阅归属和整理报告，程序负责保存任务、来源和恢复位置。
+首次使用先按 README.md 运行 `python -X utf8 -B scripts/setup.py install`，再运行自检和本仓库浏览器启动脚本。安装会创建项目级技能和独立运行目录，不改 CODEX_HOME 或全局浏览器。以下命令从仓库根目录执行，安装后优先使用 `.venv/Scripts/python.exe` 替代 `python`。
+
+`.ppl-config.json` 为本地配置，`PPL_CONFIG` 可指定另一配置文件。目录和浏览器设置均以配置为准，`.local/tmp` 示例须在改动 storage.root 后相应替换。
+
+当前为 **v0.2.0 Codex 内试用版**，沿用 11 月 10 日确认的首版定位。使用时在项目对话里直接发昵称或公开链接。Codex 负责浏览、审阅归属和整理报告，程序负责保存任务、来源和恢复位置。
 
 一次完整使用是「给入口 → 查候选 → 必要时补一条公开线索 → 确定起始账号 → 读取有限公开资料 → 核对明确关联 → 导出报告」。结束时会明确说明确认了什么、哪些未确认，以及实际查了多大范围。它不能保证每个账号都有可确认的站外信息。
 
@@ -68,7 +72,7 @@ B 站从昵称起步时，可用原昵称查站外本人公开声明，并核对
 
 ## 维护者操作
 
-程序位于 `F:/codex/Projects/public-profile-links`，默认账本目录为 `runs`。账本使用 Python 标准库，浏览器读取使用既有 Node、Playwright CLI 和共享 Chrome。归属判断由 Codex 审阅后写入账本。
+程序位于 `本仓库根目录`，默认账本目录为 `.local/runs`。账本使用 Python 标准库，浏览器读取使用既有 Node、Playwright CLI 和共享 Chrome。归属判断由 Codex 审阅后写入账本。
 
 ## 创建、恢复和导出
 
@@ -82,11 +86,11 @@ python scripts/profile_task.py resume TASK_ID
 python scripts/profile_task.py export TASK_ID
 ```
 
-`create`返回12位任务ID。若使用独立账本目录，每条命令都在子命令前加同一个 `--state-root 实际目录`。`resume`只返回进度，`xhs-run`才执行／继续正常小红书UI动作。`export`在账本目录下的 `reports/TASK_ID` 写入当前版本的 Markdown 和 JSON。默认账本目录为 `runs`。输入可选 `nickname`（必带平台）、`work`及`profile`。程序生成和调度查询，其他公开网页搜索由Codex调用现有工具并审阅结果；没有独立搜索API或模型API。
+`create`返回12位任务ID。若使用独立账本目录，每条命令都在子命令前加同一个 `--state-root 实际目录`。`resume`只返回进度，`xhs-run`才执行／继续正常小红书UI动作。`export`在账本目录下的 `reports/TASK_ID` 写入当前版本的 Markdown 和 JSON。默认账本目录为 `.local/runs`。输入可选 `nickname`（必带平台）、`work`及`profile`。程序生成和调度查询，其他公开网页搜索由Codex调用现有工具并审阅结果；没有独立搜索API或模型API。
 
 ## 小红书昵称统一执行入口
 
-先预检共享Chrome；未打开时使用既有全局启动脚本和原资料，不使用FreshOpen。先把选样先验和本轮上限存为 `F:/codex/Temp/prior.json`，例如：
+先运行安装入口和自检；用本仓库 Start-Browser.py 启动已配置的可见持久浏览器。已有配置会话时保留原标签，资料不一致就停止，不关闭其他会话。先把选样先验和本轮上限存为 `.local/tmp/prior.json`，例如：
 
 ```json
 {"sampling_prior":"只收到公开昵称和平台","limits":{"queries":8,"profiles":10,"depth":2}}
@@ -95,11 +99,11 @@ python scripts/profile_task.py export TASK_ID
 再创建昵称任务并分步执行。
 
 ```powershell
-$env:TEMP='F:/codex/Temp/public-profile-runtime'
+$env:TEMP='.local/tmp'
 $env:TMP=$env:TEMP
 node scripts/shared_browser.mjs preflight
 python scripts/profile_task.py create --label '本轮站内核验' --kind nickname --platform '小红书' --value '公开昵称'
-python scripts/profile_task.py discovery-config TASK_ID --data-file F:/codex/Temp/prior.json
+python scripts/profile_task.py discovery-config TASK_ID --data-file .local/tmp/prior.json
 python scripts/profile_task.py xhs-run TASK_ID --steps 2 --max-candidates 10 --max-profiles 3
 python scripts/profile_task.py resume TASK_ID
 python scripts/profile_task.py xhs-run TASK_ID
@@ -119,7 +123,7 @@ python scripts/profile_task.py next TASK_ID
 ```
 
 ```powershell
-python scripts/profile_task.py xhs-retry TASK_ID --data-file F:/codex/Temp/retry.json
+python scripts/profile_task.py xhs-retry TASK_ID --data-file .local/tmp/retry.json
 python scripts/profile_task.py xhs-run TASK_ID
 ```
 
@@ -133,14 +137,14 @@ python scripts/profile_task.py xhs-run TASK_ID
 
 ### 在原任务续办一条补充线索
 
-用户答复后，用原任务 ID 记录一条线索。`kind` 取 `work_title`、`work_url`（小红书直接作品页链接）或 `platform_id`（准确公开小红书号），`value` 使用该条原始线索。例如将下列内容存为 `F:/codex/Temp/clue.json`，并换成实际作品页链接：
+用户答复后，用原任务 ID 记录一条线索。`kind` 取 `work_title`、`work_url`（小红书直接作品页链接）或 `platform_id`（准确公开小红书号），`value` 使用该条原始线索。例如将下列内容存为 `.local/tmp/clue.json`，并换成实际作品页链接：
 
 ```json
 {"kind":"work_url","value":"https://www.xiaohongshu.com/explore/abc123"}
 ```
 
 ```powershell
-python scripts/profile_task.py xhs-clarify TASK_ID --data-file F:/codex/Temp/clue.json
+python scripts/profile_task.py xhs-clarify TASK_ID --data-file .local/tmp/clue.json
 python scripts/profile_task.py xhs-run TASK_ID
 python scripts/profile_task.py next TASK_ID
 ```
@@ -178,7 +182,7 @@ python scripts/profile_task.py next TASK_ID
 ```
 
 ```powershell
-python scripts/profile_task.py discovery-start TASK_ID --data-file F:/codex/Temp/start.json
+python scripts/profile_task.py discovery-start TASK_ID --data-file .local/tmp/start.json
 python scripts/profile_task.py next TASK_ID
 ```
 
@@ -252,7 +256,7 @@ python scripts/profile_task.py bilibili-reverse-xhs-review TASK_ID --data-file �
 ~~~
 
 ~~~powershell
-python scripts/profile_task.py bilibili-clarify TASK_ID --data-file F:/codex/Temp/实际线索文件.json
+python scripts/profile_task.py bilibili-clarify TASK_ID --data-file .local/tmp/实际线索文件.json
 python scripts/profile_task.py bilibili-run TASK_ID
 python scripts/profile_task.py next TASK_ID
 ~~~
@@ -334,7 +338,7 @@ python scripts/profile_task.py next TASK_ID
 
 ## 记录证据
 
-修改命令统一为 `python scripts/profile_task.py 操作 TASK_ID --data-file F:/codex/Temp/.../fields.json [--revision 当前版本]`。数据文件只放实际审阅后的结构化字段，不能输入原始网页、图片base64、微信号、个人二维码或无关个人资料。常见联系值检测只是辅助，不保证识别所有敏感内容，仍需先人工／模型筛选。
+修改命令统一为 `python scripts/profile_task.py 操作 TASK_ID --data-file .local/tmp/.../fields.json [--revision 当前版本]`。数据文件只放实际审阅后的结构化字段，不能输入原始网页、图片base64、微信号、个人二维码或无关个人资料。常见联系值检测只是辅助，不保证识别所有敏感内容，仍需先人工／模型筛选。
 
 主要操作：
 
@@ -369,12 +373,12 @@ node scripts/shared_browser.mjs step --tab 实际序号 --expect '实际笔记UR
 python scripts/profile_task.py read TASK_ID --entity A1 --tab 实际序号 --expect '实际公开URL'
 ```
 
-`read`把适配器返回的元数据、作者核对及配图队列一次写入任务；不保存正文或图片数据，不自动确认关系。读取失败保留原有证据并登记未完成项。序号每次重新查询，不能长期固定。URL或图序不符、会话关闭、验证或图片未稳定时停止，不会改用其他资料目录。会话关闭后，由助手用 `D:/Codex/Tools/Browser/Start-CodexBrowser.ps1 -Url 实际链接`复用原资料重新打开，再查询序号与进度。不要使用FreshOpen，也不要自动关闭其他任务。
+`read`把适配器返回的元数据、作者核对及配图队列一次写入任务；不保存正文或图片数据，不自动确认关系。读取失败保留原有证据并登记未完成项。序号每次重新查询，不能长期固定。URL或图序不符、会话关闭、验证或图片未稳定时停止，不会改用其他资料目录。会话关闭后，由助手用 `python Start-Browser.py --url 实际链接`复用原资料重新打开，再查询序号与进度。不要使用FreshOpen，也不要自动关闭其他任务。
 
 ### 图片仅内存传递（Codex Node REPL）
 
 ```javascript
-var bridge = await import('file:///F:/codex/Projects/public-profile-links/scripts/codex_browser_bridge.mjs');
+var bridge = await import('file:///本仓库根目录/scripts/codex_browser_bridge.mjs');
 var frame = await bridge.browser({operation:'capture',tab:实际序号,expected:'实际笔记URL',index:实际图序});
 await nodeRepl.emitImage({bytes:Buffer.from(frame.png_base64,'base64'),mimeType:'image/png'});
 delete frame.png_base64;
@@ -387,7 +391,7 @@ nodeRepl.write(frame); // 删除图片数据后才可输出元数据
 
 ## 独立私密核验（模拟）
 
-本地入口 `scripts/private_verify.py` 使用单独的模拟输入文件。将输入放在 `F:/codex/Temp`，用 `expected` 和 `observed` 放两份对照数据。手机号只比较保留的可见位。转账分别比较带时区的时间、同币种金额和状态。
+本地入口 `scripts/private_verify.py` 使用单独的模拟输入文件。将输入放在 `.local/tmp`，用 `expected` 和 `observed` 放两份对照数据。手机号只比较保留的可见位。转账分别比较带时区的时间、同币种金额和状态。
 
 ~~~json
 {
@@ -401,7 +405,7 @@ nodeRepl.write(frame); // 删除图片数据后才可输出元数据
 ~~~
 
 ~~~powershell
-python scripts/private_verify.py --input F:/codex/Temp/核验模拟输入.json --public-report F:/codex/Temp/公开报告.md --output F:/codex/Temp/含模拟核验摘要.md
+python scripts/private_verify.py --input .local/tmp/核验模拟输入.json --public-report .local/tmp/公开报告.md --output .local/tmp/含模拟核验摘要.md
 ~~~
 
-`--public-report` 可省略，此时生成单独的核验报告。`--output` 指向 F 盘上的新 Markdown。新增的「私密核验摘要（模拟）」只含核对项和一致或不一致，原公开报告与账本逐字节保留。输入使用掩码手机号、带时区的时间、两位小数字符串金额及固定状态 `pending`、`completed`、`failed` 或 `reversed`。
+`--public-report` 可省略，此时生成单独的核验报告。`--output` 指向配置允许的输出目录内的新 Markdown。新增的「私密核验摘要（模拟）」只含核对项和一致或不一致，原公开报告与账本逐字节保留。输入使用掩码手机号、带时区的时间、两位小数字符串金额及固定状态 `pending`、`completed`、`failed` 或 `reversed`。

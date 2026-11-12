@@ -1,0 +1,8 @@
+{
+  "name": "cn-public-profile-links-runtime",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Local browser dependency for the Codex public evidence workflow",
+  "engines": {"node": ">=20"},
+  "dependencies": {"@playwright/cli": "0.1.22"}
+}

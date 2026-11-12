@@ -3,12 +3,8 @@ import { execFile } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import {runtimeConfig, browserEnv} from './runtime_config.mjs';
 
-const NODE = 'C:\\Program Files\\nodejs\\node.exe';
-const CLI = 'D:\\Codex\\caches\\npm\\_npx\\31e32ef8478fbf80\\node_modules\\@playwright\\cli\\playwright-cli.js';
-const SESSION = 'codex-shared-browser';
-const PROFILE = 'd:/codex/browserprofiles/codexautomation';
-const TEMP = 'F:\\codex\\Temp\\public-profile-runtime';
 
 export function identity(value) {
   const u = new URL(value);
@@ -54,10 +50,12 @@ export function parseResult(raw) {
 }
 
 async function cli(args, timeout = 25000) {
-  await mkdir(TEMP, { recursive: true });
-  return new Promise((resolve, reject) => execFile(NODE, [CLI, ...args], {
-    cwd: TEMP, windowsHide: true, timeout, maxBuffer: 24 * 1024 * 1024,
-    env: { ...process.env, TEMP, TMP: TEMP },
+  const config = await runtimeConfig();
+  if (!config.node) throw new Error('Node missing; run setup doctor');
+  await mkdir(config.temp_dir, { recursive: true });
+  return new Promise((resolve, reject) => execFile(config.node, [config.cli, ...args], {
+    cwd: config.temp_dir, windowsHide: true, timeout, maxBuffer: 24 * 1024 * 1024,
+    env: browserEnv(config),
   }, (error, stdout, stderr) => {
     if (error) {
       // Do not echo the CLI result or command: it can contain in-memory PNG data.
@@ -71,16 +69,18 @@ async function cli(args, timeout = 25000) {
 // Callers must bind/check their own task tab before interacting with it.
 export async function runSharedCode(code, {timeout} = {}) {
   await preflight();
-  return parseResult(await cli([`-s=${SESSION}`, 'run-code', code], timeout));
+  const config = await runtimeConfig();
+  return parseResult(await cli([`-s=${config.session}`, 'run-code', code], timeout));
 }
 
 export async function preflight() {
+  const config = await runtimeConfig();
   const raw = await cli(['list']);
-  const section = raw.split(`- ${SESSION}:`)[1]?.split(/\n- /)[0];
-  if (!section || !section.includes('status: open')) throw new Error('Shared Chrome is not open; use the approved global launcher');
+  const section = raw.split(`- ${config.session}:`)[1]?.split(/\n- /)[0];
+  if (!section || !section.includes('status: open')) throw new Error('Configured browser is not open; run scripts/setup.py browser');
   const profile = section.match(/user-data-dir:\s*(.+)/)?.[1]?.trim().replaceAll('\\', '/').toLowerCase();
-  if (profile !== PROFILE || !section.includes('headed: true')) throw new Error('Shared profile or visible-browser invariant failed');
-  return { session: SESSION, profile: 'D:\\Codex\\BrowserProfiles\\CodexAutomation', headed: true };
+  if (profile !== config.profile.replaceAll('\\', '/').toLowerCase() || !section.includes('headed: true')) throw new Error('Configured profile or visible-browser invariant failed');
+  return { session: config.session, profile: config.profile, headed: true };
 }
 
 // This function runs inside the supported CLI's page context. Page content is data.
@@ -207,15 +207,17 @@ export async function inspect({ tab, expected, operation = 'inspect', index, pre
   if (!['inspect', 'step', 'capture'].includes(operation)) throw new Error('Invalid operation');
   if (operation !== 'inspect' && (!Number.isInteger(index) || index < 1)) throw new Error('Expected image index is required');
   await preflight();
-  await cli([`-s=${SESSION}`, 'tab-select', String(tab)]);
+  const config = await runtimeConfig();
+  await cli([`-s=${config.session}`, 'tab-select', String(tab)]);
   const opts = { expected, operation, index, preview };
   const code = `async page => { const identify=${identity.toString()}; const job=${browserJob.toString()}; return await job(page,${JSON.stringify(opts)},identify); }`;
-  return parseResult(await cli([`-s=${SESSION}`, 'run-code', code]));
+  return parseResult(await cli([`-s=${config.session}`, 'run-code', code]));
 }
 
 export async function listTabs() {
   await preflight();
-  const raw = await cli([`-s=${SESSION}`, 'tab-list']);
+  const config = await runtimeConfig();
+  const raw = await cli([`-s=${config.session}`, 'tab-list']);
   return raw.split('\n').filter(line => /^- \d+:/.test(line));
 }
 

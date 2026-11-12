@@ -1,24 +1,41 @@
 {
-  "version": "0.1.0",
-  "date": "2026-11-11",
-  "distribution": "Windows Codex internal trial",
-  "python": {
-    "passed": 93,
+  "version": "0.2.0",
+  "date": "2026-11-12",
+  "python_tests": {
+    "passed": 102,
     "failed": 0,
-    "elapsed_seconds": 238.653
+    "seconds": 241.116
   },
-  "node": {
+  "node_tests": {
     "passed": 19,
     "failed": 0
   },
-  "skill_format_validation": "passed",
-  "cli_help": "passed",
-  "local_document_links": {
-    "checked": 11,
-    "broken": 0
+  "configuration_tests_included": 9,
+  "skill_format": "passed",
+  "installation": {
+    "different_path_with_spaces": true,
+    "new_venv": true,
+    "fresh_local_npm_dependency_and_cache": true,
+    "project_skill_installed": true,
+    "checks_passed": 11
   },
-  "case_data": "excluded; synthetic fixtures and mocked identifiers used",
-  "secret_and_live_token_scan": "no findings",
-  "real_authentication_recovery": "not yet field-tested; deferred until encountered",
-  "cross_platform_os_support": "not verified"
+  "browser": {
+    "fresh_initially_empty_profile": true,
+    "new_visible_session": true,
+    "doctor_checks_passed": 12,
+    "python_launcher": "passed",
+    "powershell_launcher": "blocked by host script policy; no policy change"
+  },
+  "live_workflow": {
+    "entry": "Bilibili public nickname",
+    "public_clues": 1,
+    "initial_candidates": 10,
+    "works_read": 3,
+    "confirmed_single_direction_links": 2,
+    "markdown_json_consistent": true,
+    "remaining_actions": 0
+  },
+  "real_platform_authentication": "not encountered; recovery remains pending actual trigger",
+  "physical_machine": "same Windows computer with isolated runtime; another physical computer not tested",
+  "system_prerequisites": "installed Python, Node.js and Chrome were reused; maintainer configuration and login data were not copied"
 }

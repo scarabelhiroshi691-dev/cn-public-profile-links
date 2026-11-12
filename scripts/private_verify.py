@@ -10,6 +10,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from runtime_config import get_config
 from profile_links import LedgerError, fields, local_path
 
 
@@ -57,8 +58,8 @@ def result_section(data):
 
 
 def write_new(path, content):
-    # Both paths are on F; publish the complete report without replacing an existing file.
-    folder = local_path("F:/codex/Temp/public-profile-runtime", writing=True)
+    # Publish a complete new report inside configured write roots without replacement.
+    folder = local_path(get_config()["temp_dir"], writing=True)
     folder.mkdir(parents=True, exist_ok=True)
     temp = None
     try:

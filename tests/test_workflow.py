@@ -14,7 +14,7 @@ from profile_links import Store, LedgerError, PROJECT, canonical_url, public_url
 
 class WorkflowTests(unittest.TestCase):
     def setUp(self):
-        directory = Path('F:/codex/Temp/profile-ledger-tests')
+        directory = Path(tempfile.gettempdir()) / 'profile-ledger-tests'
         directory.mkdir(parents=True, exist_ok=True)
         self.temp = tempfile.TemporaryDirectory(dir=directory)
         self.addCleanup(self.temp.cleanup)

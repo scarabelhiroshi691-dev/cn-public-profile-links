@@ -14,7 +14,7 @@ class PublicMaterialsTest(unittest.TestCase):
     note = 'https://www.xiaohongshu.com/explore/abc'
 
     def setUp(self):
-        tmp = tempfile.TemporaryDirectory(dir='F:/codex/Temp/public-profile-runtime')
+        tmp = tempfile.TemporaryDirectory(dir=tempfile.gettempdir())
         self.addCleanup(tmp.cleanup)
         self.store = Store(tmp.name)
         self.tid = self.store.create('公开创作者', 'profile', self.home, '小红书')['id']

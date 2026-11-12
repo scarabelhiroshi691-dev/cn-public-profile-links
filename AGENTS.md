@@ -5,5 +5,6 @@
 - Candidate reading never confirms identity or relationships. Review exact public declarations and the observed target before recording confirmation. Preserve evidence direction and pending states.
 - Use the user's approved persistent visible browser profile. Authentication and verification are completed by the user.
 - Keep real case data, screenshots, browser profiles, credentials and personal contact values out of this repository. Test fixtures are synthetic.
-- Storage guardrails currently require F-drive writable state and temporary files and reject E-drive access. Do not silently relax these guards or move user data.
+- Read local .ppl-config.json (or PPL_CONFIG) for runtime, output and browser locations. Defaults are project-local .local and an independent visible session. Respect the user's frozen drives and configured write roots; do not silently relax guards or move user data.
+- Install with scripts/setup.py install; use doctor and browser subcommands or the bundled PowerShell wrappers. Do not borrow a maintainer's external launcher, cache path or saved browser profile.
 - Validate with Python unittest discovery and Node tests as shown in README.md. Browser-facing checks require the approved local configuration.

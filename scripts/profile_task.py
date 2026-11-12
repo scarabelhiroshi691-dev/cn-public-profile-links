@@ -7,6 +7,7 @@ import sys
 import subprocess
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from runtime_config import ConfigError, browser_command, child_env, get_config
 from profile_links import Store, OPERATIONS, LedgerError, local_path, public_url, progress, report, PROJECT
 from discovery import OPERATIONS as DISCOVERY_OPERATIONS, next_actions
 from douyin_runtime import OPERATIONS as DOUYIN_OPERATIONS, run as run_douyin
@@ -87,12 +88,12 @@ def main():
         before = store.load(args.task_id)
         if args.entity not in before["entities"]:
             raise LedgerError("Unknown entity")
-        temp = local_path('F:/codex/Temp/public-profile-runtime', writing=True)
+        temp = local_path(get_config()['temp_dir'], writing=True)
         temp.mkdir(parents=True, exist_ok=True)
-        command = ['C:/Program Files/nodejs/node.exe', str(PROJECT/'scripts/shared_browser.mjs'), 'inspect',
+        command = browser_command('shared_browser.mjs') + ['inspect',
                    '--tab', str(args.tab), '--expect', expected]
         try:
-            proc = subprocess.run(command, cwd=PROJECT, env={**os.environ, 'TEMP':str(temp), 'TMP':str(temp)},
+            proc = subprocess.run(command, cwd=PROJECT, env=child_env(),
                                   capture_output=True, text=True, encoding='utf-8', timeout=35)
             if proc.returncode:
                 raise LedgerError(json.loads(proc.stderr).get('error', 'Browser read failed'))
@@ -129,6 +130,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (LedgerError, OSError, KeyError, json.JSONDecodeError) as error:
+    except (ConfigError, LedgerError, OSError, KeyError, json.JSONDecodeError) as error:
         print(json.dumps({"error": str(error)}, ensure_ascii=False), file=sys.stderr)
         sys.exit(2)

@@ -1,4 +1,8 @@
 # Runtime and user data
+/.local/
+/.venv/
+/.agents/
+/.ppl-config.json
 /runs/
 /eval/
 /release/

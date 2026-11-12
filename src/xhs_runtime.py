@@ -1,4 +1,5 @@
 """Checkpointed normal-UI execution. Relations and root selection stay with reviewers."""
+from runtime_config import browser_command, child_env, get_config
 import copy
 import json
 import os
@@ -302,9 +303,9 @@ def flow_report(task,safe):
 
 
 def call_browser(request):
-    proc=subprocess.run(['C:/Program Files/nodejs/node.exe',str(PROJECT/'scripts/xhs_executor.mjs'),json.dumps(request,ensure_ascii=False)],
+    proc=subprocess.run(browser_command('xhs_executor.mjs') + [json.dumps(request,ensure_ascii=False)],
         cwd=PROJECT,capture_output=True,text=True,encoding='utf-8',timeout=35,
-        env={**os.environ,'TEMP':'F:/codex/Temp/public-profile-runtime','TMP':'F:/codex/Temp/public-profile-runtime'})
+        env=child_env())
     if proc.returncode:
         try: message=json.loads(proc.stderr)['error']
         except (ValueError,KeyError): message='浏览器步骤失败；未保存原始输出'

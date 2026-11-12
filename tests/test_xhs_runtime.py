@@ -16,7 +16,7 @@ from xhs_runtime import run
 
 class ExecutorTests(unittest.TestCase):
     def setUp(self):
-        parent=Path('F:/codex/Temp/xhs-runtime-tests')
+        parent=Path(tempfile.gettempdir()) / 'xhs-runtime-tests'
         parent.mkdir(parents=True,exist_ok=True)
         self.temp=tempfile.TemporaryDirectory(dir=parent)
         assert Path(self.temp.name).resolve().is_relative_to(parent.resolve())

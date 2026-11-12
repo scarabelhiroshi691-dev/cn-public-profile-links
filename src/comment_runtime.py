@@ -1,4 +1,5 @@
 """Bounded, durable reads of profile targets observed in saved priority comments."""
+from runtime_config import browser_command, child_env, get_config
 import json
 import os
 import subprocess
@@ -94,10 +95,10 @@ def validate(task):
 
 
 def call_browser(request):
-    temp = "F:/codex/Temp/public-profile-runtime"
-    result = subprocess.run(["C:/Program Files/nodejs/node.exe", str(PROJECT/"scripts/comment_executor.mjs"),
+    temp = get_config()["temp_dir"]
+    result = subprocess.run(browser_command("comment_executor.mjs") + [
         json.dumps(request, ensure_ascii=False)], cwd=PROJECT, capture_output=True, text=True, encoding="utf-8", timeout=38,
-        env={**os.environ, "TEMP": temp, "TMP": temp})
+        env=child_env())
     if result.returncode:
         raise RuntimeError("Shared Chrome did not finish the comment profile read")
     return json.loads(result.stdout)

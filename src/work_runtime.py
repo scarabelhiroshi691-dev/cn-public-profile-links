@@ -1,4 +1,5 @@
 """Public works enter the existing ledger with their own publisher and provenance."""
+from runtime_config import browser_command, child_env, get_config
 import json
 import os
 import re
@@ -316,14 +317,14 @@ def next_step(task):
 
 
 def call_browser(request):
-    temp = "F:/codex/Temp/public-profile-runtime"
+    temp = get_config()["temp_dir"]
     # WeChat has a longer landing window in addition to browser preflight and article reading.
     timeout = 85 if request["platform"] == "微信公众号" else 35
     try:
-        proc = subprocess.run(["C:/Program Files/nodejs/node.exe", str(PROJECT / "scripts/work_executor.mjs"),
+        proc = subprocess.run(browser_command("work_executor.mjs") + [
                                json.dumps(request, ensure_ascii=False)], cwd=PROJECT,
                               capture_output=True, text=True, encoding="utf-8", timeout=timeout,
-                              env={**os.environ, "TEMP":temp, "TMP":temp})
+                              env=child_env())
         if proc.returncode:
             return {"status":"failed", "reason":"作品读取工具未返回结果"}
         return json.loads(proc.stdout)

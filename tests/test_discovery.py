@@ -14,7 +14,7 @@ from discovery import next_actions, reachable
 
 class DiscoveryTests(unittest.TestCase):
     def setUp(self):
-        parent = Path('F:/codex/Temp/profile-discovery-tests')
+        parent = Path(tempfile.gettempdir()) / 'profile-discovery-tests'
         parent.mkdir(parents=True, exist_ok=True)
         self.temp = tempfile.TemporaryDirectory(dir=parent)
         self.addCleanup(self.temp.cleanup)
